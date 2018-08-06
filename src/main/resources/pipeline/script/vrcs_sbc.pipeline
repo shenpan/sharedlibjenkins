@@ -1,0 +1,273 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurperClassic
+
+final def sbcTestScopeJson = '''
+[
+    {
+        "TEST_ENV": "TESTENV_5VSD-2VPP",
+        "TEST_EXECUTION": [
+            {
+                "PROJ": "test-5g-rcs",
+                "BEAN_GEN_CMD": "./generateSTPBean.sh -6 vpp ${VPP_IP}",
+                "TEST_ARG": {
+                    "skipTests": "false",
+                    "test.suite": "./src/main/resources/testsuites/production/vpp2_sbc_17B.xml",
+                    "rm.stp": "vpp",
+                    "msran.check.configuration.id": "event_prepostchecks_vrc",
+                    "java.net.preferIPv6Addresses": "true",
+                    "fetchLogs": "no",
+                    "waitForCpuNormalization": "false"
+                }
+            },
+            {
+                "PROJ": "test-5g-rcs",
+                "BEAN_GEN_CMD": "echo 'No bean generation needed'",
+                "TEST_ARG": {
+                    "skipTests": "false",
+                    "rm.stp": "${SELECTED_CLOUD}",
+                    "test.suite": "./src/main/resources/testsuites/production/ai_vpp_sbc.xml",
+                    "vnfmPackagePath": "${VNFM_SW}",
+                    "vnfPackagePath": "${VPP_SW}",
+                    "__vnfmPackagePath": "/proj/rcs-tmp2/SW/LATEST_SW_FROM_EIFFEL/CXP2010084_1A/latest.zip",
+                    "__vnfPackagePath": "/proj/rcs-tmp2/SW/LATEST_SW_FROM_EIFFEL/CXP2010146_1A/latest.zip",
+                    "jcat.logging": "DEBUG",
+                    "vnfmHost": "${VNFM_IP}",
+                    "msran.vnf.name.prefix": "${CLEANUP_PREFIX}"
+                }
+            },
+            {
+                "PROJ": "test-5g-gsds",
+                "BEAN_GEN_CMD": "./update_bean_5vsd_1vpp_1rbs.py ${CLEANUP_PREFIX} 5vsd_1vpp_1rbs_template.xml v6 ${RM_STP}",
+                "TEST_ARG": {
+                    "skipTests": "false",
+                    "test.suite": "./src/main/resources/suites/sbc/GsdsSbcTestSuite.xml",
+                    "rm.stp": "${RM_STP}",
+                    "vnfmHost": "${VNFM_IP}"
+                }
+            },
+            {
+                "PROJ": "test-5g-vnfmanager",
+                "BEAN_GEN_CMD": "echo 'No bean generation needed'",
+                "TEST_ARG": {
+                    "skipTests": "false",
+                    "test.suite": "./src/main/resources/suites/SBC/sbc_vpp_upgrade.xml",
+                    "rm.stp": "Central_redhat017_rcs_ci",
+                    "__rm.stp": "Central_redhat017_rcs_ci_pre",
+                    "vnfmHost": "${VNFM_IP}",
+                    "from_vnf_uri": "/proj/rcs-tmp2/SW/LATEST_SW_FROM_EIFFEL/CXP2010146_1A/latest.zip",
+                    "to_vnf_uri": "${VPP_SW}",
+                    "__from_vnf_uri": "https://arm010-eiffel001.seki.rnd.ericsson.se:8443/nexus/content/repositories/public/com/ericsson/CXP2010146_1A/R7A79/CXP2010146_1A-R7A79.zip",
+                    "__to_vnf_uri": "/proj/rcs-tmp2/SW/LATEST_SW_FROM_EIFFEL/CXP2010146_1A/latest.zip",
+                    "msran.vnf.name.prefix": "${CLEANUP_PREFIX}"
+                }
+            }
+        ]
+    }
+]
+'''
+
+
+final def testEnvJson = '''
+{
+    "TESTENV_5VSD-2VPP": [
+        {
+            "name": "rbs 1",
+            "nodeType": "dus52",
+            "__swPackage": "${MSRBS_SW}",
+            "swPackage": "/proj/rcs-tmp2/SW/MSRBS/CXP9024418_6/main/CL3/latest.zip",
+            "tenant": "${SELECTED_CLOUD}"
+        },
+        {
+            "name": "vnfm instance 1",
+            "nodeType": "vnfm",
+            "__swPackage": "${VNFM_SW}",
+            "swPackage": "/proj/rcs-tmp2/SW/LATEST_SW_FROM_EIFFEL/CXP2010084_1A/latest.zip",
+            "tenant": "${SELECTED_CLOUD}"
+        },
+        {
+            "name": "vpp instance 1",
+            "nodeType": "vpp",
+            "swPackage": "${VPP_SW}",
+            "__swPackage": "/proj/rcs-tmp2/SW/LATEST_SW_FROM_EIFFEL/CXP2010146_1A/latest.zip",
+            "tenant": "${SELECTED_CLOUD}"
+        },
+        {
+            "name": "vsd instance 1",
+            "nodeType": "vsd",
+            "swPackage": "${VSD_SW}",
+            "__swPackage": "/proj/rcs-tmp2/SW/LATEST_SW_FROM_EIFFEL/CXP2010086_1A/latest.zip",
+            "tenant": "${SELECTED_CLOUD}"
+        },
+        {
+            "name": "vsd instance 2",
+            "nodeType": "vsd",
+            "swPackage": "${VSD_SW}",
+            "__swPackage": "/proj/rcs-tmp2/SW/LATEST_SW_FROM_EIFFEL/CXP2010086_1A/latest.zip",
+            "tenant": "${SELECTED_CLOUD}"
+        },
+        {
+            "name": "vsd instance 3",
+            "nodeType": "vsd",
+            "swPackage": "${VSD_SW}",
+            "__swPackage": "/proj/rcs-tmp2/SW/LATEST_SW_FROM_EIFFEL/CXP2010086_1A/latest.zip",
+            "tenant": "${SELECTED_CLOUD}"
+        },
+        {
+            "name": "vsd instance 4",
+            "nodeType": "vsd",
+            "swPackage": "${VSD_SW}",
+            "__swPackage": "/proj/rcs-tmp2/SW/LATEST_SW_FROM_EIFFEL/CXP2010086_1A/latest.zip",
+            "tenant": "${SELECTED_CLOUD}"
+        },
+        {
+            "name": "vsd instance 5",
+            "nodeType": "vsd",
+            "swPackage": "${VSD_SW}",
+            "__swPackage": "/proj/rcs-tmp2/SW/LATEST_SW_FROM_EIFFEL/CXP2010086_1A/latest.zip",
+            "tenant": "${SELECTED_CLOUD}"
+        }
+    ]
+}
+'''
+
+
+final def initParamMap = ["RM_STP": "MY_STP", "SELECTED_CLOUD": "MY_CLOUD"]
+
+
+def substitute(template, map) {
+    def tmplStr = JsonOutput.toJson(template)
+    map.each { if (it.value != null) { tmplStr = tmplStr.replace("\${" + it.key + "}", it.value) } }
+    return new JsonSlurperClassic().parseText(tmplStr)
+}
+
+
+def buildVranClosureMap(physicNodes, vnfmNodes, vnfNodes) {
+    def phyMap = [:]
+    def vnfmIp = null
+    def vnfMap = [:]
+    def closureMap = [:]
+    closureMap["Physical Nodes Setup"] = {
+        stage("Physical Nodes Setup") {
+            script {
+                physicNodes.each {
+                    phyMap[it.name] = {
+                        // node {
+                            stage("DUS52 Node: ${it.name}") {
+                                echo it.nodeType
+                                sleep 10
+                            }
+                        // }
+                    }
+                }
+            }
+            parallel phyMap
+        }
+    }
+    closureMap["Virtual Nodes Setup"] = {
+        stage("VNFM Setup") {
+            sleep 5
+            echo "VNFM created"
+            vnfmIp = "1.2.3.4"
+        }
+        stage("VNF Setup") {
+            script {
+                vnfNodes.each {
+                    vnfMap[it.name] = {
+                        // node {
+                            stage("VNF Node: ${it.name}") {
+                                echo "VNFM: $vnfmIp"
+                                echo it.nodeType
+                                sleep 5
+                            }
+                        // }
+                    }
+                }
+            }
+            parallel vnfMap
+        }
+    }
+    return closureMap
+}
+
+
+pipeline {
+    agent any
+
+    environment {
+        physicNodes = ""
+        vnfmNodes = ""
+        vnfNodes = ""
+    }
+
+    options {
+        timestamps()
+    }
+
+    stages {
+        stage ("Parse Config") {
+            steps {
+                script {
+                    def sbcTestScope = new JsonSlurperClassic().parseText(sbcTestScopeJson)[0]
+                    def testEnvType = sbcTestScope["TEST_ENV"]
+                    def testExecutionList = sbcTestScope["TEST_EXECUTION"]
+                    print "testEnvType: $testEnvType"
+
+                    // initParamMap.putAll(UP_MAP)
+                    def testEnv = new JsonSlurperClassic().parseText(testEnvJson)["TESTENV_5VSD-2VPP"]
+                    def ranNodes = substitute(testEnv, initParamMap)
+                    def ranNodesList = ranNodes.split{ it.nodeType == "dus52" }
+                    physicNodes = ranNodesList[0]
+                    def virtualNodes = ranNodesList[1]
+                    def virtualNodesList = virtualNodes.split{ it.nodeType == "vnfm" }
+                    vnfmNodes = virtualNodesList[0]
+                    vnfNodes = virtualNodesList[1]
+                    println "physicNodes: $physicNodes"
+                    println "vnfmNodes: $vnfmNodes"
+                    println "vnfNodes: $vnfNodes"
+                    assert vnfmNodes.size == 1 : "ERROR: No or more than one VNFM defined in Test ENV!"
+                }
+            }
+        }
+        stage ("Test ENV Setup") {
+            steps {
+                echo "2 physicNodes: $physicNodes"
+                echo "2 vnfmNodes: $vnfmNodes"
+                echo "2 vnfNodes: $vnfNodes"
+                script {
+                    println "Test ENV Setup"
+                    parallel buildVranClosureMap(physicNodes, vnfmNodes, vnfNodes)
+                }
+            }
+            post {
+                failure {
+                    echo "Test ENV creation falied!!!"
+                }
+            }
+        }
+        stage ("Test Exection") {
+            steps {
+                script {
+                    println "3333"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Report"
+            echo "Clean Up"
+        }
+        success {
+            echo "SBC successed!!!"
+        }
+        failure {
+            echo "SBC falied!!!"
+            echo "Fetching ESI"
+            echo "Mail to team: failed..."
+        }
+    }
+}
+
+
+
