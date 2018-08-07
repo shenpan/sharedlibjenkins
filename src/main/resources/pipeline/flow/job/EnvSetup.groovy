@@ -2,6 +2,8 @@ package flow.job
 
 import javaposse.jobdsl.dsl.DslFactory
 
+import flow.util.Utility
+
 public class EnvSetup {
 
     public final static String JOB_NAME = "env-setup"
