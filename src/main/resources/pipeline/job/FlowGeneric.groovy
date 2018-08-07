@@ -2,6 +2,8 @@ package job
 
 import javaposse.jobdsl.dsl.DslFactory
 
+import job.Utility
+
 public class FlowGeneric {
 
     public final static String JOB_NAME = "flow-generic"
