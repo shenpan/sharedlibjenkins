@@ -9,11 +9,13 @@ public class FlowGeneric {
     public final static String JOB_NAME = "flow-generic"
 
     public static void createJob(DslFactory dslFactory) {
-        Utility.test()
+        println Utility.test()
+        println "=="
+        def pipelineScript = readFileFromWorkspace("src/main/resources/pipeline/script/flow-generic.pipeline")
         dslFactory.pipelineJob(JOB_NAME) {
             definition {
                 cps {
-                    script(readFileFromWorkspace("src/main/resources/pipeline/script/flow-generic.pipeline"))
+                    script(pipelineScript)
                 }
             }
         }
