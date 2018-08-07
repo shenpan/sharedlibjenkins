@@ -1,4 +1,4 @@
-package job
+package flow.job
 
 import javaposse.jobdsl.dsl.DslFactory
 
