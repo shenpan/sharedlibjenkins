@@ -1,13 +1,16 @@
-import javaposse.jobdsl.plugin.GlobalJobDslSecurityConfiguration
-import jenkins.model.GlobalConfiguration
+//import job.FlowGeneric
+//import job.RunTestTarget
+//import job.EnvSetup
 
-GlobalConfiguration.all().get(GlobalJobDslSecurityConfiguration.class).useScriptSecurity=false
+File test = new File()
+println "test path:" + test.getAbsolutePath()
 
-import job.FlowGeneric
-import job.RunTestTarget
-import job.EnvSetup
+File sourceFile = new File("job/lib/jenkins/jobs/PROJ/jobs/PROJ.jenkins.dsl.helpers/jobs/master/jobs/build/workspace/FlowGeneric.groovy")
+Class TemplatesDSL = new GroovyClassLoader(getClass().getClassLoader()).parseClass(sourceFile)
 
-FlowGeneric.createJob(this)
-RunTestTarget.createJob(this)
-EnvSetup.createJob(this)
+
+TemplatesDSL.createJob(this)
+//FlowGeneric.createJob(this)
+//RunTestTarget.createJob(this)
+//EnvSetup.createJob(this)
 
