@@ -11,7 +11,7 @@ public class FlowGeneric {
     public static void createJob(DslFactory dslFactory) {
         println Utility.test()
         println "=="
-        def pipelineScript = readFileFromWorkspace("src/main/resources/pipeline/script/flow-generic.pipeline")
+        def pipelineScript = readFileFromWorkspace('src/main/resources/pipeline/script/flow-generic.pipeline')
         dslFactory.pipelineJob(JOB_NAME) {
             definition {
                 cps {
